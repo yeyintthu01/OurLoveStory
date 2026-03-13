@@ -1,48 +1,23 @@
-// Notion API endpoint
-const NOTION_API_URL = "https://api.notion.com/v1";
-
-// Get the API token from environment or use a proxy
-// For GitHub Pages, we'll use a CORS proxy approach
-const NOTION_TOKEN =
-  process.env.NOTION_TOKEN || localStorage.getItem("notionToken");
+// Notion API endpoint using public proxy (no authentication needed)
+const NOTION_API_PROXY = "https://notion-api.splitbee.io/v1/table";
 
 // Fetch timeline data from Notion
 async function fetchTimeline() {
   try {
     const response = await fetch(
-      `${NOTION_API_URL}/databases/${NOTION_CONFIG.timelineDbId}/query`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${NOTION_TOKEN}`,
-          "Notion-Version": "2022-06-28",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sorts: [
-            {
-              property: "Year",
-              direction: "ascending",
-            },
-          ],
-        }),
-      },
+      `${NOTION_API_PROXY}/${NOTION_CONFIG.timelineDbId}`,
     );
 
     if (!response.ok) {
-      if (response.status === 401) {
-        showNotionSetupGuide();
-        return;
-      }
-      throw new Error(`Notion API error: ${response.status}`);
+      throw new Error(`API error: ${response.status}`);
     }
 
     const data = await response.json();
-    renderTimeline(data.results);
+    renderTimeline(data);
   } catch (error) {
     console.error("Error fetching timeline:", error);
     document.getElementById("timeline-container").innerHTML =
-      '<p class="error">Unable to load timeline. Please configure your Notion token.</p>';
+      '<p class="error">Unable to load timeline. Make sure your Notion database is shared publicly.</p>';
   }
 }
 
@@ -50,38 +25,19 @@ async function fetchTimeline() {
 async function fetchGallery() {
   try {
     const response = await fetch(
-      `${NOTION_API_URL}/databases/${NOTION_CONFIG.galleryDbId}/query`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${NOTION_TOKEN}`,
-          "Notion-Version": "2022-06-28",
-          "Content-Type": "application/json",
-        },
-      },
+      `${NOTION_API_PROXY}/${NOTION_CONFIG.galleryDbId}`,
     );
 
     if (!response.ok) {
-      throw new Error(`Notion API error: ${response.status}`);
+      throw new Error(`API error: ${response.status}`);
     }
 
     const data = await response.json();
-    renderGallery(data.results);
+    renderGallery(data);
   } catch (error) {
     console.error("Error fetching gallery:", error);
     document.getElementById("gallery-container").innerHTML =
-      '<p class="error">Unable to load gallery. Please configure your Notion token.</p>';
-  }
-}
-
-// Show setup guide if token is missing
-function showNotionSetupGuide() {
-  const token = prompt(
-    "Enter your Notion Integration Token:\n\nYou can get this from https://www.notion.com/my-integrations",
-  );
-  if (token) {
-    localStorage.setItem("notionToken", token);
-    location.reload();
+      '<p class="error">Unable to load gallery. Make sure your Notion database is shared publicly.</p>';
   }
 }
 
@@ -89,7 +45,7 @@ function showNotionSetupGuide() {
 function renderTimeline(items) {
   const container = document.getElementById("timeline-container");
 
-  if (items.length === 0) {
+  if (!items || items.length === 0) {
     container.innerHTML =
       '<p class="empty">No timeline items yet. Add some in Notion!</p>';
     return;
@@ -97,10 +53,9 @@ function renderTimeline(items) {
 
   let html = "";
   items.forEach((item) => {
-    const props = item.properties;
-    const year = props.Year?.title?.[0]?.plain_text || "N/A";
-    const title = props.Title?.title?.[0]?.plain_text || "Untitled";
-    const description = props.Description?.rich_text?.[0]?.plain_text || "";
+    const year = item.Year || "N/A";
+    const title = item.Title || "Untitled";
+    const description = item.Description || "";
 
     html += `
             <div class="timeline-item">
@@ -121,7 +76,7 @@ function renderTimeline(items) {
 function renderGallery(items) {
   const container = document.getElementById("gallery-container");
 
-  if (items.length === 0) {
+  if (!items || items.length === 0) {
     container.innerHTML =
       '<p class="empty">No gallery items yet. Add some in Notion!</p>';
     return;
@@ -129,15 +84,14 @@ function renderGallery(items) {
 
   let html = "";
   items.forEach((item) => {
-    const props = item.properties;
-    const title = props.Title?.title?.[0]?.plain_text || "Memory";
+    const title = item.Title || "Memory";
     const imageUrl =
-      props.Image?.url || "https://via.placeholder.com/300x300?text=No+Image";
-    const description = props.Description?.rich_text?.[0]?.plain_text || "";
+      item.Image || "https://via.placeholder.com/300x300?text=No+Image";
+    const description = item.Description || "";
 
     html += `
             <div class="gallery-item">
-                <img src="${imageUrl}" alt="${title}">
+                <img src="${imageUrl}" alt="${title}" onerror="this.src='https://via.placeholder.com/300x300?text=Image+Error'">
                 <p>${description || title}</p>
             </div>
         `;
@@ -231,10 +185,6 @@ document
 
 // Load data when page loads
 document.addEventListener("DOMContentLoaded", function () {
-  if (!NOTION_TOKEN) {
-    showNotionSetupGuide();
-  } else {
-    fetchTimeline();
-    fetchGallery();
-  }
+  fetchTimeline();
+  fetchGallery();
 });
