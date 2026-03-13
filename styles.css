@@ -305,3 +305,17 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Loading and Error States */
+.loading,
+.error,
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-style: italic;
+}
+
+.error {
+  color: #e74c3c;
+}
