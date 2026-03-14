@@ -1,8 +1,16 @@
 {
   "name": "our-love-story",
   "version": "1.0.0",
-  "description": "Our Love Story Website",
+  "private": true,
   "scripts": {
-    "build": "echo 'Static site, no build needed'"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
   }
 }

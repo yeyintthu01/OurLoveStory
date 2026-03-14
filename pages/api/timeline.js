@@ -1,12 +1,9 @@
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
   const DATABASE_ID = "32249e6b779a8050ad1fc89b0b192986";
 
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Content-Type", "application/json");
-
   if (!NOTION_TOKEN) {
-    return res.status(500).json({ error: "NOTION_TOKEN not set" });
+    return res.status(500).json({ error: "NOTION_TOKEN not configured" });
   }
 
   try {
@@ -24,13 +21,10 @@ module.exports = async (req, res) => {
     );
 
     if (!response.ok) {
-      return res
-        .status(response.status)
-        .json({ error: `Notion API error: ${response.status}` });
+      throw new Error(`Notion API error: ${response.status}`);
     }
 
     const data = await response.json();
-
     const timeline = data.results.map((item) => ({
       Year: item.properties.Year?.title?.[0]?.plain_text || "N/A",
       Title: item.properties.Title?.title?.[0]?.plain_text || "Untitled",
@@ -38,9 +32,9 @@ module.exports = async (req, res) => {
         item.properties.Description?.rich_text?.[0]?.plain_text || "",
     }));
 
-    return res.status(200).json(timeline);
+    res.status(200).json(timeline);
   } catch (error) {
     console.error("Error:", error);
-    return res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
-};
+}
