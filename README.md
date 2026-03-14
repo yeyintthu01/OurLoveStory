@@ -109,3 +109,7 @@ OurLoveStory/
 ---
 
 Made with 💕 for your love story
+
+## Deployed on Vercel
+
+Your website is now live with Notion integration!
