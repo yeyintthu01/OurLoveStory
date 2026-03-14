@@ -1,18 +1,7 @@
-// Try multiple Notion API proxies
-const PROXIES = [
-  "https://notion-api.splitbee.io/v1/table",
-  "https://notion-render.com/api/v1/table",
-];
-
-let currentProxyIndex = 0;
-
-// Fetch timeline data from Notion
+// Fetch timeline data from Vercel API
 async function fetchTimeline() {
   try {
-    const dbId = NOTION_CONFIG.timelineDbId;
-    const response = await fetch(`${PROXIES[currentProxyIndex]}/${dbId}`, {
-      timeout: 5000,
-    });
+    const response = await fetch("/api/timeline");
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -23,17 +12,16 @@ async function fetchTimeline() {
   } catch (error) {
     console.error("Error fetching timeline:", error);
     document.getElementById("timeline-container").innerHTML =
-      '<p class="error">Unable to load timeline from Notion. Please check your database is published.</p>';
+      '<p class="error">Unable to load timeline. Error: ' +
+      error.message +
+      "</p>";
   }
 }
 
-// Fetch gallery data from Notion
+// Fetch gallery data from Vercel API
 async function fetchGallery() {
   try {
-    const dbId = NOTION_CONFIG.galleryDbId;
-    const response = await fetch(`${PROXIES[currentProxyIndex]}/${dbId}`, {
-      timeout: 5000,
-    });
+    const response = await fetch("/api/gallery");
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -44,7 +32,9 @@ async function fetchGallery() {
   } catch (error) {
     console.error("Error fetching gallery:", error);
     document.getElementById("gallery-container").innerHTML =
-      '<p class="error">Unable to load gallery from Notion. Please check your database is published.</p>';
+      '<p class="error">Unable to load gallery. Error: ' +
+      error.message +
+      "</p>";
   }
 }
 
