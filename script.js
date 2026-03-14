@@ -1,49 +1,57 @@
-// Notion API endpoint using public proxy (no authentication needed)
-const NOTION_API_PROXY = "https://notion-api.splitbee.io/v1/table";
-
-// Fetch timeline data from Notion
+// Fetch timeline data from Notion public page
 async function fetchTimeline() {
   try {
+    // Using Notion's public API for published databases
     const response = await fetch(
-      `${NOTION_API_PROXY}/${NOTION_CONFIG.timelineDbId}`,
+      `https://notion-api.splitbee.io/v1/table/${NOTION_CONFIG.timelineDbId}`,
     );
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      console.error("Timeline fetch failed:", response.status);
+      throw new Error(`Failed to fetch: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log("Timeline data:", data);
     renderTimeline(data);
   } catch (error) {
     console.error("Error fetching timeline:", error);
     document.getElementById("timeline-container").innerHTML =
-      '<p class="error">Unable to load timeline. Make sure your Notion database is shared publicly.</p>';
+      '<p class="error">Unable to load timeline. Error: ' +
+      error.message +
+      "</p>";
   }
 }
 
-// Fetch gallery data from Notion
+// Fetch gallery data from Notion public page
 async function fetchGallery() {
   try {
     const response = await fetch(
-      `${NOTION_API_PROXY}/${NOTION_CONFIG.galleryDbId}`,
+      `https://notion-api.splitbee.io/v1/table/${NOTION_CONFIG.galleryDbId}`,
     );
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      console.error("Gallery fetch failed:", response.status);
+      throw new Error(`Failed to fetch: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log("Gallery data:", data);
     renderGallery(data);
   } catch (error) {
     console.error("Error fetching gallery:", error);
     document.getElementById("gallery-container").innerHTML =
-      '<p class="error">Unable to load gallery. Make sure your Notion database is shared publicly.</p>';
+      '<p class="error">Unable to load gallery. Error: ' +
+      error.message +
+      "</p>";
   }
 }
 
 // Render timeline items
 function renderTimeline(items) {
   const container = document.getElementById("timeline-container");
+
+  console.log("Rendering timeline with items:", items);
 
   if (!items || items.length === 0) {
     container.innerHTML =
@@ -75,6 +83,8 @@ function renderTimeline(items) {
 // Render gallery items
 function renderGallery(items) {
   const container = document.getElementById("gallery-container");
+
+  console.log("Rendering gallery with items:", items);
 
   if (!items || items.length === 0) {
     container.innerHTML =
@@ -185,6 +195,9 @@ document
 
 // Load data when page loads
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("Page loaded, fetching data...");
+  console.log("Timeline DB ID:", NOTION_CONFIG.timelineDbId);
+  console.log("Gallery DB ID:", NOTION_CONFIG.galleryDbId);
   fetchTimeline();
   fetchGallery();
 });
