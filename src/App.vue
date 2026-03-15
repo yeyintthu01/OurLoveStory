@@ -20,6 +20,9 @@
 
     <router-view />
 
+    <!-- Floating Chat Button -->
+    <button class="floating-chat-btn" @click="$router.push('/chat')">💬</button>
+
     <AdminPanel
       v-if="showAdmin"
       @close="showAdmin = false"
@@ -146,5 +149,35 @@ body {
   .nav-links {
     gap: 1rem;
   }
+}
+
+/* Floating Chat Button */
+.floating-chat-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #cc0000, #660000);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-chat-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.floating-chat-btn:active {
+  transform: scale(0.95);
 }
 </style>

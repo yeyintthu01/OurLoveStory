@@ -444,8 +444,8 @@ export default {
 
 .photo-preview img {
   width: 100%;
-  height: 150px;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   border-radius: 4px;
 }
 
@@ -515,8 +515,8 @@ export default {
 
 .post-image {
   width: 100%;
-  height: 250px;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
   border-radius: 4px;
 }
 

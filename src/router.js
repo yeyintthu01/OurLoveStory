@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "./pages/Home.vue";
 import Feed from "./pages/Feed.vue";
+import Chat from "./pages/Chat.vue";
 
 const routes = [
   {
@@ -10,6 +11,10 @@ const routes = [
   {
     path: "/feed",
     component: Feed,
+  },
+  {
+    path: "/chat",
+    component: Chat,
   },
 ];
 
