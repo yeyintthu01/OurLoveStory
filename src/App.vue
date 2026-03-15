@@ -6,12 +6,12 @@
         <ul class="nav-links">
           <li><router-link to="/">Home</router-link></li>
           <li><router-link to="/feed">OurFeed</router-link></li>
-          <li><a href="#admin" @click="showAdmin = !showAdmin">Admin</a></li>
+          <li><a @click="showAdmin = !showAdmin">Admin</a></li>
         </ul>
       </div>
     </nav>
 
-    <section class="hero">
+    <section v-if="$route.path === '/'" class="hero">
       <div class="hero-content">
         <h2>Our Journey Together</h2>
         <p>A love story worth sharing</p>
@@ -53,6 +53,12 @@ export default {
   box-sizing: border-box;
 }
 
+html,
+body,
+#app {
+  width: 100%;
+}
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -67,30 +73,32 @@ body {
 
 /* Navigation */
 .navbar {
-  background: linear-gradient(135deg, #ff6b9d, #ffa07a);
+  background: linear-gradient(135deg, #1a0000, #4d0000);
   color: white;
-  padding: 1rem 0;
+  padding: 0.3rem 0;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  width: 100%;
 }
 
 .navbar .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 5px 20px;
 }
 
 .logo {
-  font-size: 1.8rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
 .nav-links {
   display: flex;
   list-style: none;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .nav-links a {
@@ -98,6 +106,7 @@ body {
   text-decoration: none;
   cursor: pointer;
   transition: opacity 0.3s;
+  font-size: 0.8rem;
 }
 
 .nav-links a:hover {
@@ -112,10 +121,11 @@ body {
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #ff6b9d, #ffa07a);
+  background: linear-gradient(135deg, #1a0000, #4d0000);
   color: white;
   padding: 100px 20px;
   text-align: center;
+  width: 100%;
 }
 
 .hero-content h2 {

@@ -210,7 +210,7 @@ export default {
 
 .admin-header h2 {
   margin: 0;
-  color: #ff6b9d;
+  color: #cc0000;
 }
 
 .close-btn {
@@ -240,8 +240,8 @@ export default {
 }
 
 .tab-btn.active {
-  color: #ff6b9d;
-  border-bottom-color: #ff6b9d;
+  color: #cc0000;
+  border-bottom-color: #cc0000;
 }
 
 .admin-content {
@@ -271,8 +271,8 @@ textarea {
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: #ff6b9d;
-  box-shadow: 0 0 0 2px rgba(255, 107, 157, 0.1);
+  border-color: #cc0000;
+  box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
 }
 
 textarea {
@@ -282,7 +282,7 @@ textarea {
 
 button[type="submit"] {
   padding: 10px;
-  background: linear-gradient(135deg, #ff6b9d, #ffa07a);
+  background: linear-gradient(135deg, #cc0000, #660000);
   color: white;
   border: none;
   border-radius: 4px;

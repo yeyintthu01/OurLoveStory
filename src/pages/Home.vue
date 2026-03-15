@@ -108,7 +108,7 @@ export default {
   transform: translateX(-50%);
   width: 4px;
   height: 100%;
-  background: #ff6b9d;
+  background: #cc0000;
 }
 
 .timeline-item {
@@ -132,7 +132,7 @@ export default {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  background: #ff6b9d;
+  background: #cc0000;
   color: white;
   padding: 10px 20px;
   border-radius: 50px;
@@ -149,7 +149,7 @@ export default {
 }
 
 .timeline-content h3 {
-  color: #ff6b9d;
+  color: #cc0000;
   margin-bottom: 10px;
 }
 
@@ -194,7 +194,7 @@ export default {
 .gallery-item p {
   padding: 15px;
   text-align: center;
-  color: #ff6b9d;
+  color: #cc0000;
   font-weight: 500;
 }
 
