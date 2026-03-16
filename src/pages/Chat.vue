@@ -51,15 +51,19 @@
     </div>
 
     <div class="chat-input-section">
-      <input
-        v-model="newMessage"
-        @keyup.enter="sendMessage"
-        @input="handleTyping"
-        type="text"
-        placeholder="Type a message..."
-        class="chat-input"
-      />
-      <button @click="sendMessage" class="send-btn">Send</button>
+      <div class="input-wrapper">
+        <input
+          v-model="newMessage"
+          @keyup.enter="sendMessageWithAnimation"
+          @input="handleTyping"
+          type="text"
+          :placeholder="
+            currentSender === 'ako' ? 'Sent to Shoon' : 'Sent to A Ko'
+          "
+          class="chat-input"
+        />
+      </div>
+      <button @click="sendMessageWithAnimation" class="send-btn">❤️</button>
     </div>
   </div>
 </template>
@@ -133,6 +137,10 @@ export default {
       }
     };
 
+    const sendMessageWithAnimation = async () => {
+      await sendMessage();
+    };
+
     const formatTime = (timestamp) => {
       if (!timestamp) return "";
       const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -152,6 +160,7 @@ export default {
       isTyping,
       currentSender,
       sendMessage,
+      sendMessageWithAnimation,
       handleTyping,
       formatTime,
     };
@@ -294,6 +303,12 @@ export default {
 .chat-input-section {
   display: flex;
   gap: 10px;
+  align-items: center;
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
 }
 
 .chat-input {
@@ -304,6 +319,7 @@ export default {
   font-family: inherit;
   font-size: 0.9rem;
   transition: all 0.3s;
+  width: 100%;
 }
 
 .chat-input:focus {
@@ -313,14 +329,28 @@ export default {
 }
 
 .send-btn {
-  padding: 12px 25px;
-  background: linear-gradient(135deg, #cc0000, #660000);
-  color: white;
+  padding: 12px 15px;
+  background: none;
+  color: #cc0000;
   border: none;
   border-radius: 25px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 50px;
+}
+
+.send-btn:hover {
+  transform: scale(1.1);
+}
+
+.send-btn:active {
+  animation: heartBeat 0.6s ease-in-out;
 }
 
 .send-btn:hover {
@@ -389,3 +419,7 @@ export default {
   }
 }
 </style>
+
+@keyframes heartBeat { 0% { transform: scale(1); } 10%, 20% { transform:
+scale(1.2); } 30% { transform: scale(1); } 40%, 50% { transform: scale(1.15); }
+60% { transform: scale(1); } }
