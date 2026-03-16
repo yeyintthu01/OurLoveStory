@@ -5,6 +5,24 @@
       <button @click="$emit('close')" class="close-chat-btn">✕</button>
     </div>
 
+    <!-- Sender Selection -->
+    <div class="sender-selector">
+      <button
+        @click="currentSender = 'ako'"
+        :class="{ active: currentSender === 'ako' }"
+        class="sender-btn"
+      >
+        A Ko
+      </button>
+      <button
+        @click="currentSender = 'shoon'"
+        :class="{ active: currentSender === 'shoon' }"
+        class="sender-btn"
+      >
+        Shoon
+      </button>
+    </div>
+
     <div class="messages-container">
       <div v-if="messages.length === 0" class="empty-chat">
         <p>Start a conversation with your love</p>
@@ -12,17 +30,12 @@
       <div
         v-for="msg in messages"
         :key="msg.id"
-        :class="['message', msg.sender]"
+        :class="['message', msg.sender === 'ako' ? 'user' : 'other']"
       >
         <div class="message-content">
           <p>
             {{ msg.text }}
-            <span class="message-time"
-              >{{ formatTime(msg.createdAt) }}
-              <span class="checkmark" :class="{ seen: msg.seen }">{{
-                msg.seen ? "✓✓" : "✓"
-              }}</span></span
-            >
+            <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
           </p>
         </div>
       </div>
@@ -71,6 +84,7 @@ export default {
     const messages = ref([]);
     const newMessage = ref("");
     const isTyping = ref(false);
+    const currentSender = ref("ako");
     let typingTimeout;
 
     const loadMessages = async () => {
@@ -84,7 +98,7 @@ export default {
 
           // Mark all messages as seen when loaded
           snapshot.docs.forEach((doc) => {
-            if (!doc.data().seen && doc.data().sender !== "user") {
+            if (!doc.data().seen && doc.data().sender !== "ako") {
               updateDoc(doc(db, "chat", doc.id), { seen: true });
             }
           });
@@ -108,7 +122,7 @@ export default {
       try {
         await addDoc(collection(db, "chat"), {
           text: newMessage.value,
-          sender: "user",
+          sender: currentSender.value,
           seen: false,
           createdAt: new Date(),
         });
@@ -136,6 +150,7 @@ export default {
       messages,
       newMessage,
       isTyping,
+      currentSender,
       sendMessage,
       handleTyping,
       formatTime,
@@ -182,6 +197,31 @@ export default {
 
 .close-chat-btn:hover {
   opacity: 0.8;
+}
+
+/* Sender Selector */
+.sender-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.sender-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+  color: #666;
+}
+
+.sender-btn.active {
+  background: linear-gradient(135deg, #cc0000, #660000);
+  color: white;
+  border-color: #cc0000;
 }
 
 .messages-container {
@@ -249,14 +289,6 @@ export default {
   opacity: 0.7;
   white-space: nowrap;
   margin-left: auto;
-}
-
-.checkmark {
-  margin-left: 4px;
-}
-
-.checkmark.seen {
-  color: #4db8ff;
 }
 
 .chat-input-section {

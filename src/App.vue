@@ -21,7 +21,13 @@
     <router-view />
 
     <!-- Floating Chat Button -->
-    <button class="floating-chat-btn" @click="$router.push('/chat')">💬</button>
+    <button
+      v-if="$route.path !== '/chat'"
+      class="floating-chat-btn"
+      @click="$router.push('/chat')"
+    >
+      💬
+    </button>
 
     <AdminPanel
       v-if="showAdmin"
