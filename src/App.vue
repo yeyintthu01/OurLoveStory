@@ -6,6 +6,7 @@
         <ul class="nav-links">
           <li><router-link to="/">Home</router-link></li>
           <li><router-link to="/feed">OurFeed</router-link></li>
+          <li><router-link to="/letters">Letters</router-link></li>
           <li><a @click="showAdmin = !showAdmin">Admin</a></li>
         </ul>
       </div>

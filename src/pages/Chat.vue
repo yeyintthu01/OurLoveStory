@@ -27,18 +27,22 @@
       <div v-if="messages.length === 0" class="empty-chat">
         <p>Start a conversation with your love</p>
       </div>
-      <div
-        v-for="msg in messages"
-        :key="msg.id"
-        :class="['message', msg.sender === 'ako' ? 'user' : 'other']"
-      >
-        <div class="message-content">
-          <p>
-            {{ msg.text }}
-            <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
-          </p>
+
+      <template v-for="(msg, index) in messages" :key="msg.id">
+        <!-- Date Separator -->
+        <div v-if="showDateSeparator(msg, index)" class="date-separator">
+          <span>{{ formatDateLabel(msg.createdAt) }}</span>
         </div>
-      </div>
+
+        <div :class="['message', msg.sender === 'ako' ? 'user' : 'other']">
+          <div class="message-content">
+            <p>
+              {{ msg.text }}
+              <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
+            </p>
+          </div>
+        </div>
+      </template>
 
       <!-- Typing Indicator -->
       <div v-if="isTyping" class="message other">
@@ -150,6 +154,34 @@ export default {
       });
     };
 
+    const getDateKey = (timestamp) => {
+      if (!timestamp) return "";
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toDateString();
+    };
+
+    const showDateSeparator = (msg, index) => {
+      if (index === 0) return true;
+      const prevMsg = messages.value[index - 1];
+      return getDateKey(msg.createdAt) !== getDateKey(prevMsg.createdAt);
+    };
+
+    const formatDateLabel = (timestamp) => {
+      if (!timestamp) return "";
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+
+      if (date.toDateString() === today.toDateString()) return "Today";
+      if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+      return date.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      });
+    };
+
     onMounted(() => {
       loadMessages();
     });
@@ -163,6 +195,8 @@ export default {
       sendMessageWithAnimation,
       handleTyping,
       formatTime,
+      showDateSeparator,
+      formatDateLabel,
     };
   },
 };
@@ -252,6 +286,22 @@ export default {
   height: 100%;
   color: #999;
   font-style: italic;
+}
+
+/* Date Separator */
+.date-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.date-separator span {
+  background: #e0e0e0;
+  color: #888;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 12px;
 }
 
 .message {
