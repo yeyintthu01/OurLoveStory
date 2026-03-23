@@ -3,10 +3,18 @@
     <nav class="navbar">
       <div class="container">
         <h1 class="logo">💕 Our Love Story</h1>
-        <ul class="nav-links">
+        <button class="hamburger" @click="menuOpen = !menuOpen">
+          <span></span><span></span><span></span>
+        </button>
+        <ul
+          class="nav-links"
+          :class="{ open: menuOpen }"
+          @click="menuOpen = false"
+        >
           <li><router-link to="/">Home</router-link></li>
           <li><router-link to="/feed">OurFeed</router-link></li>
           <li><router-link to="/letters">Letters</router-link></li>
+          <li><router-link to="/diary">Diary</router-link></li>
           <li><a @click="showAdmin = !showAdmin">Admin</a></li>
         </ul>
       </div>
@@ -43,15 +51,11 @@ import { ref } from "vue";
 import AdminPanel from "./components/AdminPanel.vue";
 
 export default {
-  components: {
-    AdminPanel,
-  },
+  components: { AdminPanel },
   setup() {
     const showAdmin = ref(false);
-
-    return {
-      showAdmin,
-    };
+    const menuOpen = ref(false);
+    return { showAdmin, menuOpen };
   },
 };
 </script>
@@ -98,6 +102,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 5px 20px;
+  position: relative;
 }
 
 .logo {
@@ -148,13 +153,55 @@ body {
   opacity: 0.9;
 }
 
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
 @media (max-width: 768px) {
   .hero-content h2 {
     font-size: 2rem;
   }
 
+  .hamburger {
+    display: flex;
+  }
+
   .nav-links {
-    gap: 1rem;
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1a0000, #4d0000);
+    padding: 10px 20px 20px;
+    gap: 0.5rem;
+    z-index: 99;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 0;
   }
 }
 

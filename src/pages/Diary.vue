@@ -1,82 +1,78 @@
 <template>
-  <div class="letters-container">
-    <div class="letters-header">
-      <h1>💌 Our Letters</h1>
-      <p>Words from the heart</p>
+  <div class="diary-container">
+    <div class="diary-header">
+      <h1>📔 Our Diary</h1>
+      <p>Daily moments & routines</p>
     </div>
 
-    <!-- Write Letter Form -->
+    <!-- Write Button -->
+    <button v-if="!showForm" @click="showForm = true" class="write-btn">
+      ✍️ Write Today's Entry
+    </button>
+
+    <!-- Write Form -->
     <transition name="slide-fade">
-      <div v-if="showForm" class="letter-form">
-        <h3>Write a Letter</h3>
-        <select v-model="newLetter.from" class="letter-input">
+      <div v-if="showForm" class="diary-form">
+        <select v-model="newEntry.from" class="diary-input">
           <option value="">From...</option>
           <option value="A Ko">A Ko</option>
           <option value="Shoon">Shoon</option>
         </select>
-
         <textarea
-          v-model="newLetter.content"
-          placeholder="Write your letter here..."
-          class="letter-textarea"
+          v-model="newEntry.content"
+          placeholder="How was your day?"
+          class="diary-textarea"
         ></textarea>
         <div class="form-buttons">
           <button @click="showForm = false" class="btn-cancel">Cancel</button>
           <button
-            @click="submitLetter"
+            @click="submitEntry"
             class="btn-submit"
-            :disabled="!newLetter.from || !newLetter.content.trim()"
+            :disabled="!newEntry.from || !newEntry.content.trim()"
           >
-            Send Letter 💌
+            Save Entry 📔
           </button>
         </div>
       </div>
     </transition>
 
-    <!-- Write Button -->
-    <button v-if="!showForm" @click="showForm = true" class="write-btn">
-      ✍️ Write a Letter
-    </button>
-
-    <!-- Letters List -->
-    <div class="letters-list">
-      <div v-if="letters.length === 0" class="empty">
-        <p>No letters yet. Write your first letter!</p>
+    <!-- Entries List -->
+    <div class="entries-list">
+      <div v-if="entries.length === 0" class="empty">
+        <p>No entries yet. Write your first diary entry!</p>
       </div>
       <div
-        v-for="letter in letters"
-        :key="letter.id"
-        class="letter-card"
-        @click="openLetter(letter)"
+        v-for="entry in entries"
+        :key="entry.id"
+        class="entry-card"
+        @click="openEntry(entry)"
       >
-        <div class="letter-card-header">
-          <span class="letter-from">From {{ letter.from }}</span>
-          <span class="letter-date">{{ formatDate(letter.createdAt) }}</span>
+        <div class="entry-header">
+          <span class="entry-from">{{ entry.from }}</span>
+          <span class="entry-date">{{ formatDate(entry.createdAt) }}</span>
         </div>
-        <h3 class="letter-title"></h3>
-        <p class="letter-preview">{{ letter.content.substring(0, 100) }}...</p>
+        <p class="entry-preview">{{ entry.content.substring(0, 120) }}...</p>
       </div>
     </div>
 
-    <!-- Letter Detail Modal -->
+    <!-- Entry Detail Modal -->
     <transition name="slide-fade">
       <div
-        v-if="selectedLetter"
-        class="letter-modal-overlay"
-        @click.self="selectedLetter = null"
+        v-if="selectedEntry"
+        class="modal-overlay"
+        @click.self="selectedEntry = null"
       >
-        <div class="letter-modal">
+        <div class="entry-modal">
           <div class="modal-header">
             <div>
-              <span class="letter-from">From {{ selectedLetter.from }}</span>
-              <span class="letter-date">
-                · {{ formatDate(selectedLetter.createdAt) }}</span
+              <span class="entry-from">{{ selectedEntry.from }}</span>
+              <span class="entry-date">
+                · {{ formatDate(selectedEntry.createdAt) }}</span
               >
             </div>
-            <button @click="selectedLetter = null" class="close-btn">✕</button>
+            <button @click="selectedEntry = null" class="close-btn">✕</button>
           </div>
-          <h2 class="modal-title"></h2>
-          <p class="modal-content">{{ selectedLetter.content }}</p>
+          <p class="modal-content">{{ selectedEntry.content }}</p>
         </div>
       </div>
     </transition>
@@ -96,37 +92,34 @@ import { db } from "../firebase";
 
 export default {
   setup() {
-    const letters = ref([]);
+    const entries = ref([]);
     const showForm = ref(false);
-    const selectedLetter = ref(null);
-    const newLetter = ref({ from: "", content: "" });
+    const selectedEntry = ref(null);
+    const newEntry = ref({ from: "", content: "" });
 
-    const loadLetters = async () => {
+    const loadEntries = async () => {
       try {
-        const q = query(
-          collection(db, "letters"),
-          orderBy("createdAt", "desc"),
-        );
+        const q = query(collection(db, "diary"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
-        letters.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        entries.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       } catch (error) {
-        console.error("Error loading letters:", error);
+        console.error("Error loading entries:", error);
       }
     };
 
-    const submitLetter = async () => {
-      if (!newLetter.value.from || !newLetter.value.content.trim()) return;
+    const submitEntry = async () => {
+      if (!newEntry.value.from || !newEntry.value.content.trim()) return;
       try {
-        await addDoc(collection(db, "letters"), {
-          from: newLetter.value.from,
-          content: newLetter.value.content,
+        await addDoc(collection(db, "diary"), {
+          from: newEntry.value.from,
+          content: newEntry.value.content,
           createdAt: new Date(),
         });
-        newLetter.value = { from: "", content: "" };
+        newEntry.value = { from: "", content: "" };
         showForm.value = false;
-        loadLetters();
+        loadEntries();
       } catch (error) {
-        console.error("Error submitting letter:", error);
+        console.error("Error saving entry:", error);
       }
     };
 
@@ -151,35 +144,35 @@ export default {
       });
     };
 
-    const openLetter = (letter) => {
-      selectedLetter.value = letter;
+    const openEntry = (entry) => {
+      selectedEntry.value = entry;
     };
 
     onMounted(() => {
-      loadLetters();
+      loadEntries();
     });
 
     return {
-      letters,
+      entries,
       showForm,
-      newLetter,
-      selectedLetter,
+      newEntry,
+      selectedEntry,
       formatDate,
-      submitLetter,
-      openLetter,
+      submitEntry,
+      openEntry,
     };
   },
 };
 </script>
 
 <style scoped>
-.letters-container {
+.diary-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
 }
 
-.letters-header {
+.diary-header {
   text-align: center;
   padding: 25px 15px;
   background: linear-gradient(135deg, #1a0000, #4d0000);
@@ -188,17 +181,16 @@ export default {
   margin-bottom: 20px;
 }
 
-.letters-header h1 {
+.diary-header h1 {
   margin: 0;
   font-size: 1.8rem;
 }
-.letters-header p {
+.diary-header p {
   margin: 5px 0 0 0;
   opacity: 0.9;
   font-size: 0.9rem;
 }
 
-/* Write Button */
 .write-btn {
   width: 100%;
   padding: 12px;
@@ -217,8 +209,7 @@ export default {
   color: white;
 }
 
-/* Letter Form */
-.letter-form {
+.diary-form {
   background: white;
   border-radius: 8px;
   padding: 20px;
@@ -230,12 +221,8 @@ export default {
   animation: slideUp 0.3s ease-out;
 }
 
-.letter-form h3 {
-  margin: 0;
-  color: #1a0000;
-}
-
-.letter-input {
+.diary-input,
+.diary-textarea {
   padding: 10px 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -244,28 +231,17 @@ export default {
   transition: all 0.3s;
 }
 
-.letter-input:focus {
+.diary-input:focus,
+.diary-textarea:focus {
   outline: none;
   border-color: #cc0000;
   box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
 }
 
-.letter-textarea {
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 0.9rem;
-  min-height: 200px;
+.diary-textarea {
+  min-height: 180px;
   resize: vertical;
   line-height: 1.6;
-  transition: all 0.3s;
-}
-
-.letter-textarea:focus {
-  outline: none;
-  border-color: #cc0000;
-  box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
 }
 
 .form-buttons {
@@ -293,7 +269,6 @@ export default {
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: opacity 0.3s;
 }
 
 .btn-submit:disabled {
@@ -301,8 +276,7 @@ export default {
   cursor: not-allowed;
 }
 
-/* Letters List */
-.letters-list {
+.entries-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -315,7 +289,7 @@ export default {
   font-style: italic;
 }
 
-.letter-card {
+.entry-card {
   background: white;
   border-radius: 8px;
   padding: 20px;
@@ -326,40 +300,33 @@ export default {
   animation: fadeIn 0.4s ease-out;
 }
 
-.letter-card:hover {
+.entry-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-.letter-card-header {
+.entry-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
 }
-
-.letter-from {
+.entry-from {
   font-size: 0.85rem;
   color: #cc0000;
   font-weight: 600;
 }
-.letter-date {
+.entry-date {
   font-size: 0.8rem;
   color: #999;
 }
-.letter-title {
-  margin: 0 0 8px 0;
-  color: #1a0000;
-  font-size: 1.1rem;
-}
-.letter-preview {
+.entry-preview {
   margin: 0;
   color: #666;
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
-/* Modal */
-.letter-modal-overlay {
+.modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
@@ -370,7 +337,7 @@ export default {
   padding: 20px;
 }
 
-.letter-modal {
+.entry-modal {
   background: white;
   border-radius: 12px;
   padding: 30px;
@@ -385,7 +352,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
 }
 
 .close-btn {
@@ -396,14 +365,6 @@ export default {
   color: #999;
 }
 
-.modal-title {
-  margin: 0 0 20px 0;
-  color: #1a0000;
-  font-size: 1.4rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 15px;
-}
-
 .modal-content {
   color: #333;
   line-height: 1.8;
@@ -411,17 +372,13 @@ export default {
   white-space: pre-wrap;
 }
 
-/* Transitions */
 .slide-fade-enter-active {
   transition: all 0.3s ease;
 }
 .slide-fade-leave-active {
   transition: all 0.2s ease;
 }
-.slide-fade-enter-from {
-  opacity: 0;
-  transform: translateY(-10px);
-}
+.slide-fade-enter-from,
 .slide-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
